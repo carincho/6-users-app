@@ -1,8 +1,10 @@
 
 import { LoginPages } from "./auth/pages/LoginPages";
-import { UsersPage } from "./pages/UsersPage";
-import { NavBar } from "./components/layout/NavBar";
 import { useAuth } from "./auth/hooks/useAuth";
+import { Navigate, Route, Routes } from "react-router-dom";
+import { UserRoutes } from "./routes/UserRoutes";
+
+//Con la ruta /* se indica que cualquier ruta que no sea login se redirija a login, esto es para evitar que el usuario pueda acceder a rutas privadas sin estar autenticado */
 
 export const UsersApp = () => {
 
@@ -10,21 +12,22 @@ export const UsersApp = () => {
     
     return (
 
-        <>
+        <Routes>
 
             {
             login.isAuth
                 ? (
-                    <>
-                        <NavBar login={login} handlerLogout={handlerLogout} className="navbar navbar-light bg-light" />
-                        <UsersPage />
-                    </>
+                   <Route path="/*" element={ <UserRoutes login={login} handlerLogout={handlerLogout} />}/>
                 )
-                : <LoginPages handlerLogin={handlerLogin} />
+                :
+                <> 
+                    <Route path="/login" element={ <LoginPages handlerLogin={handlerLogin} />}/>
+                    <Route path="/*" element={ <Navigate to="/login" />}/>
+                </>
             }
 
 
-        </>
+        </Routes>
     );
     
 }
