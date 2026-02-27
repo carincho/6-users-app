@@ -1,14 +1,15 @@
 
 import { LoginPages } from "./auth/pages/LoginPages";
-import { useAuth } from "./auth/hooks/useAuth";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { UserRoutes } from "./routes/UserRoutes";
+import { useContext } from "react";
+import { AuthContext } from "./auth/context/AuthContext";
 
 //Con la ruta /* se indica que cualquier ruta que no sea login se redirija a login, esto es para evitar que el usuario pueda acceder a rutas privadas sin estar autenticado */
 
 export const UsersApp = () => {
 
-    const { login, handlerLogin, handlerLogout } = useAuth();
+    const { login } = useContext(AuthContext);
     
     return (
 
@@ -17,11 +18,11 @@ export const UsersApp = () => {
             {
             login.isAuth
                 ? (
-                   <Route path="/*" element={ <UserRoutes login={login} handlerLogout={handlerLogout} />}/>
+                   <Route path="/*" element={ <UserRoutes  />}/>
                 )
                 :
                 <> 
-                    <Route path="/login" element={ <LoginPages handlerLogin={handlerLogin} />}/>
+                    <Route path="/login" element={ <LoginPages/>}/>
                     <Route path="/*" element={ <Navigate to="/login" />}/>
                 </>
             }

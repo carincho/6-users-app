@@ -2,50 +2,24 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { UsersPage } from "../pages/UsersPage";
 import { NavBar } from "../components/layout/NavBar";
 import { RegisterPage } from "../pages/RegisterPage";
-import { useUsers } from "../hooks/useUsers";
+import { UserProvider } from "../context/UserProvider";
 
-export const UserRoutes = ({login, handlerLogout}) => {
+export const UserRoutes = ({}) => {
 
-     const {
-            users,
-            userSelected,
-            initialUserForm,
-            visibleForm,
-            handlerAddUser,
-            handlerRemoveUser,
-            handlerUserSelectedForm,
-            handlerOpenForm,
-            handlerCloseForm,
-    
-        } = useUsers();
+//    Los hijos son todos los que esta anidado dentro del provider, es decir todos los componentes que van a consumir el contexto
 
     return (
         <>
-            <NavBar login={login} handlerLogout={handlerLogout}/>
-            <Routes>
-                <Route path="users" element={ <UsersPage 
-                    users={users}
-                    userSelected={userSelected}
-                    initialUserForm={initialUserForm}
-                    visibleForm={visibleForm}
-                    handlerAddUser={handlerAddUser}
-                    handlerRemoveUser={handlerRemoveUser}
-                    handlerUserSelectedForm={handlerUserSelectedForm}
-                    handlerOpenForm={handlerOpenForm}
-                    handlerCloseForm={handlerCloseForm} 
-            />}/>
-             <Route path="/" element={<Navigate to={"/users"} />} />
+            <UserProvider>
+                <NavBar />
+                <Routes>
+                    <Route path="users" element={<UsersPage/>} />
+                    <Route path="/" element={<Navigate to={"/users"} />} />
+                    <Route path="users/register" element={<RegisterPage />} />
+                    <Route path="users/edit/:id" element={<RegisterPage/>} />
 
-                <Route path="users/register" element={ <RegisterPage 
-                    handlerAddUser={handlerAddUser} 
-                    initialUserForm={initialUserForm} />}/>
-
-                <Route path="users/edit/:id" element={ <RegisterPage 
-                    users={users}
-                    handlerAddUser={handlerAddUser} 
-                    initialUserForm={initialUserForm} />}/>
-               
-            </Routes>
+                </Routes>
+            </UserProvider>
 
         </>
     );

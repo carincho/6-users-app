@@ -4,11 +4,15 @@ import './styles.css'
 import { UsersApp } from './UsersApp'
 import { LoginPages } from './auth/pages/LoginPages'
 import { BrowserRouter } from 'react-router-dom'
+import { AuthProvider } from './auth/context/AuthProvider'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
-      <UsersApp />
+      <AuthProvider>
+        <UsersApp />
+      </AuthProvider>
+
     </BrowserRouter>
 
   </StrictMode>,
