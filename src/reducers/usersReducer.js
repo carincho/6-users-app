@@ -11,7 +11,6 @@ export const usersReducer = (state = [], action) => {
                 ...state,
                 {
                     ...action.payload,//Este es el objeto usuario
-                    id: new Date().getTime(),
 
                 }
             ];
@@ -30,6 +29,9 @@ export const usersReducer = (state = [], action) => {
                     }
                     return u;
                 })// map devuelve una nueva instancia del arreglo con los cambios es inmutable
+
+                case 'loadingUsers':
+                    return action.payload; //Aqui el payload es la lista de usuarios que se obtiene de la consulta a la base de datos
     
         default:
             return state;

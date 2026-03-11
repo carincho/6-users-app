@@ -1,6 +1,6 @@
 import { UserModalForm } from "../components/UserModalForm";
 import { UsersList } from "../components/UsersList";
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { UserContext } from "../context/UserContext";
 
 
@@ -13,8 +13,14 @@ export const UsersPage = ({ }) => {
     users,
     visibleForm,
     handlerOpenForm,
+    getUsers,
 
 } = useContext(UserContext);
+
+//Se invoca cuando se crea el componente userList por unica vez, es decir cuando se monta el componente, se hace la consulta a la base de datos para obtener los usuarios y se actualiza el estado con la lista de usuarios obtenida
+    useEffect(() => {
+        getUsers();
+    }, []);
 
     return (
         <>
