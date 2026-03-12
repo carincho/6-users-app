@@ -6,7 +6,7 @@ import { UserContext } from "../context/UserContext";
 
 export const UserForm = ({ userSelected, handlerCloseForm }) => {
 
-    const { initialUserForm, handlerAddUser } = useContext(UserContext);
+    const { initialUserForm, handlerAddUser, errors } = useContext(UserContext);
     const [userForm, setUserForm] = useState(initialUserForm);
     const { id, username, password, email } = userForm;
 
@@ -37,30 +37,30 @@ export const UserForm = ({ userSelected, handlerCloseForm }) => {
 
         //Guardar el user form en el listado de usuarios
 
-        if (!username || (!password && id === 0) || !email) {
+        // if (!username || (!password && id === 0) || !email) {
 
-            Swal.fire({
-                title: "Error de validacion",
-                text: "Debe completar los campos del formulario",
-                icon: "error"
-            });
-
-
-            return;
-        }
-        if (!email.includes('@')) {
-            Swal.fire({
-                title: "Error de validacion email",
-                text: "El email debe contener el simbolo @",
-                icon: "error"
-            });
+        //     Swal.fire({
+        //         title: "Error de validacion",
+        //         text: "Debe completar los campos del formulario",
+        //         icon: "error"
+        //     });
 
 
-            return;
+        //     return;
+        // }
+        // if (!email.includes('@')) {
+        //     Swal.fire({
+        //         title: "Error de validacion email",
+        //         text: "El email debe contener el simbolo @",
+        //         icon: "error"
+        //     });
 
-        }
+
+        //     return;
+
+        // }
         handlerAddUser(userForm);
-        setUserForm(initialUserForm);
+        // setUserForm(initialUserForm);ya no se limpia el estado del formulario porque se hace desde el contexto para que se limpie al cerrar el formulario y no solo al agregar un usuario nuevo sino tambien al editar un usuario existente
 
     }
 
@@ -79,6 +79,8 @@ export const UserForm = ({ userSelected, handlerCloseForm }) => {
                 value={username}
                 onChange={onInputChange} />
 
+                <p className="text-danger">{errors?.username}</p>
+
             {/* Esto se simplifica si mayor que 0 nada de lo contrario aparece el campo para el password */}
             {id > 0 || <input className="form-control my-3 w-75"
                 placeholder="Password"
@@ -87,6 +89,7 @@ export const UserForm = ({ userSelected, handlerCloseForm }) => {
                 value={password}
                 onChange={onInputChange} />
             }
+            <p className="text-danger">{errors?.password}</p>
 
 
             <input className="form-control my-3 w-75"
@@ -94,6 +97,7 @@ export const UserForm = ({ userSelected, handlerCloseForm }) => {
                 name="email"
                 value={email}
                 onChange={onInputChange} />
+                <p className="text-danger">{errors?.email}</p>
 
             <input type="hidden"
                 name="id"

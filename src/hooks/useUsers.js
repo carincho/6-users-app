@@ -13,11 +13,18 @@ const initialUserForm = {
     email: ''
 };
 
+const initialErrors = {
+    username: '',
+    password: '',
+    email: ''
+};
+
 export const useUsers = () => {
 
     const [users, dispatch] = useReducer(usersReducer, initialUsers);//El reducer propio y los valores iniciales
     const [userSelected, setUserSelected] = useState(initialUserForm);
     const [visibleForm, setVisibleForm] = useState(false);
+    const [errors, setErrors] = useState({ initialErrors });//Guardamos los errores de validacion del formulario
     const navigate = useNavigate();
 
     const getUsers = async () => {
@@ -38,30 +45,56 @@ export const useUsers = () => {
         // console.log(user);
 
         let response;
-        if (user.id === 0) {
 
-            response = await saveUser(user);
-        } else {
-            response = await updateUser(user);
+        try {
+
+            if (user.id === 0) {
+
+                response = await saveUser(user);
+            } else {
+                response = await updateUser(user);
+            }
+
+            dispatch({
+                type: (user.id === 0) ? 'addUser' : 'updateUser',
+                payload: response.data,
+
+            });
+
+            Swal.fire({
+                title: (user.id === 0) ?
+                    "Usuario Creado" :
+                    "Usuario Actualizado",
+                text: (user.id === 0) ?
+                    "El usuario ha sido creado con exito" :
+                    "El usuario ha sido actualizado con exito",
+                icon: "success"
+            });
+            handlerCloseForm();
+            navigate('/users');
+
+        } catch (error) {
+
+            if (error.response && error.response.status == 400) {
+                setErrors(error.response.data);
+            } else if (error.response && error.response.status == 500 &&
+                error.response.data?.message?.includes('constraint')) {
+
+                if (error.response.data?.message?.includes('UK_username')) {
+
+                    setErrors({ username: 'El username ya existe, por favor elija otro' });
+                }
+
+                if (error.response.data?.message?.includes('UK_email')) {
+
+                    setErrors({ email: 'El email ya existe, por favor elija otro' });
+                }
+            } else {
+
+                throw error;
+            }
+
         }
-
-        dispatch({
-            type: (user.id === 0) ? 'addUser' : 'updateUser',
-            payload: response.data,
-
-        });
-
-        Swal.fire({
-            title: (user.id === 0) ?
-                "Usuario Creado" :
-                "Usuario Actualizado",
-            text: (user.id === 0) ?
-                "El usuario ha sido creado con exito" :
-                "El usuario ha sido actualizado con exito",
-            icon: "success"
-        });
-        handlerCloseForm();
-        navigate('/users');
     }
 
     const handlerRemoveUser = (id) => {
@@ -116,12 +149,14 @@ export const useUsers = () => {
 
         setVisibleForm(false);
         setUserSelected(initialUserForm);
+        setErrors({});
     }
     return {
         users,
         userSelected,
         initialUserForm,
         visibleForm,
+        errors,
         handlerAddUser,
         handlerRemoveUser,
         handlerUserSelectedForm,
