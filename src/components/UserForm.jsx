@@ -8,7 +8,8 @@ export const UserForm = ({ userSelected, handlerCloseForm }) => {
 
     const { initialUserForm, handlerAddUser, errors } = useContext(UserContext);
     const [userForm, setUserForm] = useState(initialUserForm);
-    const { id, username, password, email } = userForm;
+    const [checked, setChecked] = useState(userForm.admin);
+    const { id, username, password, email, admin } = userForm;
 
     //Esto cuando cambia userSelected se gatilla el cambio para el formulario para actualizar los datos mostrados
     useEffect(() => {
@@ -27,6 +28,17 @@ export const UserForm = ({ userSelected, handlerCloseForm }) => {
             [name]: value,//esto es propiedad computada del objeto que es variable segun el campo o input del formulario
 
         })
+
+    }
+
+    const onCheckBoxChange = () => {
+
+        setChecked(!checked);
+        setUserForm({
+
+            ...userForm,
+            admin: checked,
+        });
 
     }
 
@@ -79,7 +91,7 @@ export const UserForm = ({ userSelected, handlerCloseForm }) => {
                 value={username}
                 onChange={onInputChange} />
 
-                <p className="text-danger">{errors?.username}</p>
+            <p className="text-danger">{errors?.username}</p>
 
             {/* Esto se simplifica si mayor que 0 nada de lo contrario aparece el campo para el password */}
             {id > 0 || <input className="form-control my-3 w-75"
@@ -97,7 +109,17 @@ export const UserForm = ({ userSelected, handlerCloseForm }) => {
                 name="email"
                 value={email}
                 onChange={onInputChange} />
-                <p className="text-danger">{errors?.email}</p>
+            <p className="text-danger">{errors?.email}</p>
+
+            <div className="my-3 form-check">
+                <input type="checkbox"
+                    name="admin"
+                    checked={admin}
+                    className="form-check-input"
+                    onChange={onCheckBoxChange} />
+
+                    <label className="form-check-label">Admin</label>
+            </div>
 
             <input type="hidden"
                 name="id"

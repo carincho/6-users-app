@@ -1,8 +1,9 @@
 import Swal from "sweetalert2";
 import { usersReducer } from "../reducers/usersReducer";
-import { useReducer, useState } from "react";
+import { useContext, useReducer, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { deleteUser, findAllUsers, saveUser, updateUser } from "../auth/services/userService";
+import { AuthContext } from "../auth/context/AuthContext";
 
 const initialUsers = [];
 
@@ -10,7 +11,8 @@ const initialUserForm = {
     id: 0,
     username: '',
     password: '',
-    email: ''
+    email: '',
+    admin: false,
 };
 
 const initialErrors = {
@@ -27,22 +29,37 @@ export const useUsers = () => {
     const [errors, setErrors] = useState({ initialErrors });//Guardamos los errores de validacion del formulario
     const navigate = useNavigate();
 
+    const { login, handlerLogout } = useContext(AuthContext);//Se va a requerirel contexto de login
+
     const getUsers = async () => {
 
-        const result = await findAllUsers();
+        try {
 
-        console.log(result);
+            const result = await findAllUsers();
 
-        dispatch({
-            type: 'loadingUsers',
-            payload: result.data,
-        });
+            console.log(result);
+
+            dispatch({
+                type: 'loadingUsers',
+                payload: result.data,
+            });
+
+        } catch (error) {
+
+            if (error.response?.status == 401) {
+                handlerLogout();
+
+            }
+        }
+
     }
 
     const handlerAddUser = async (user) => {
 
         // console.log('handlerAddUser');
         // console.log(user);
+
+        if (!login.isAdmin) return;
 
         let response;
 
@@ -89,6 +106,10 @@ export const useUsers = () => {
 
                     setErrors({ email: 'El email ya existe, por favor elija otro' });
                 }
+
+            } else if (error.response?.status == 401) {
+                handlerLogout();
+
             } else {
 
                 throw error;
@@ -101,6 +122,7 @@ export const useUsers = () => {
 
         // console.log(id);
 
+        if (!login.isAdmin) return;
 
         Swal.fire({
             title: "Estas seguro que desea eliminar?",
@@ -110,22 +132,35 @@ export const useUsers = () => {
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
             confirmButtonText: "Si, eliminar!"
-        }).then((result) => {
+        }).then(async (result) => { //Esta funcion tiene que ser async por que la llamada a deleteUser cambio a async
             if (result.isConfirmed) {
 
-                deleteUser(id);
-                //Aqui se elimina si se confirma
-                dispatch({
-                    type: 'removeUser',
-                    payload: id,
+                try {
 
-                });
+                    await deleteUser(id); // se cambio a await por que apesar de ser void si existe un error lo lanza y ahi si lo regresa
+                    //Aqui se elimina si se confirma
+                    dispatch({
+                        type: 'removeUser',
+                        payload: id,
 
-                Swal.fire({
-                    title: "Usuario Eliminado!",
-                    text: "El usuario ha sido eliminado con exito.",
-                    icon: "success"
-                });
+                    });
+
+                    Swal.fire({
+                        title: "Usuario Eliminado!",
+                        text: "El usuario ha sido eliminado con exito.",
+                        icon: "success"
+                    });
+                } catch (error) {
+
+                    if (error.response?.status == 401) {
+                        handlerLogout();
+
+                    }
+
+                }
+
+
+
             }
         });
 

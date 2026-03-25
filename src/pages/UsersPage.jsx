@@ -2,6 +2,7 @@ import { UserModalForm } from "../components/UserModalForm";
 import { UsersList } from "../components/UsersList";
 import { useContext, useEffect } from "react";
 import { UserContext } from "../context/UserContext";
+import { AuthContext } from "../auth/context/AuthContext";
 
 
 
@@ -16,6 +17,8 @@ export const UsersPage = ({ }) => {
     getUsers,
 
 } = useContext(UserContext);
+
+const {login} = useContext(AuthContext);//Se va a requerirel contexto de login
 
 //Se invoca cuando se crea el componente userList por unica vez, es decir cuando se monta el componente, se hace la consulta a la base de datos para obtener los usuarios y se actualiza el estado con la lista de usuarios obtenida
     useEffect(() => {
@@ -47,7 +50,7 @@ export const UsersPage = ({ }) => {
 
                     <div className="col">
 
-                        {visibleForm || <button
+                        {(visibleForm || !login.isAdmin) || <button
                             className="btn btn-primary my-2"
                             onClick={handlerOpenForm} >
                             Nuevo Usuario
