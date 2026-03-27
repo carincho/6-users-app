@@ -1,12 +1,15 @@
-import { useContext, useEffect, useState } from "react";
+
 import { UserForm } from "../components/UserForm";
 import { useParams } from "react-router-dom";
-import { UserContext } from "../context/UserContext";
+import { useUsers } from "../hooks/useUsers";
+import { useEffect, useState } from "react";
 
 export const RegisterPage = () => {
 
-    const { users = [], initialUserForm } = useContext(UserContext);
+    // const { users = [], initialUserForm } = useContext(UserContext);Se modifica
 
+    const { users = [], initialUserForm } = useUsers();//Ahora se usa el hooks que ya tiene el redux
+    
     const [userSelected, setUserSelected] = useState(initialUserForm);
     const { id } = useParams();
 

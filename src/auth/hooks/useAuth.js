@@ -1,43 +1,48 @@
-
-import { useReducer } from "react";
-import { LoginReducer } from "../reducers/loginReducer";
 import Swal from "sweetalert2";
 import { loginUser } from "../services/authService";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { onLogin, onLogout } from "../../store/slices/auth/authSlice";
 
-const initialLogin = JSON.parse(sessionStorage.getItem('login')) ||
-{
-    isAuth: false,
-    isAdmin: false,// se agrega en los datos iniciales
-    user: undefined,
+// const initialLogin = JSON.parse(sessionStorage.getItem('login')) || el estado inicial se paso al slice authSlice
+// {
+//     isAuth: false,
+//     isAdmin: false,// se agrega en los datos iniciales
+//     user: undefined,
 
-};
+// };
 
 export const useAuth = () => {
 
-    const [login, dispatch] = useReducer(LoginReducer, initialLogin);
+    const dispatch = useDispatch();// Se crea el dispatch
+    const {user, isAdmin, isAuth} = useSelector(state => state.auth);
+    // const [login, dispatch] = useReducer(LoginReducer, initialLogin);
     const navigate = useNavigate();
 
-    const handlerLogin = async({ username, password }) => {
-        
-        
+    const handlerLogin = async ({ username, password }) => {
+
+
         try {
-            
+
             const response = await loginUser({ username, password });
 
             const token = response.data.token;//Se obtiene de la promesa en el authservice
-            const claims = JSON.parse(window.atob (token.split('.')[1])) ;// se obtienen los claims para saber si es admin, el indice uno es el payload, window atob decodifica base 64
+            const claims = JSON.parse(window.atob(token.split('.')[1]));// se obtienen los claims para saber si es admin, el indice uno es el payload, window atob decodifica base 64
 
             console.log(claims);
 
 
-            const user = { username: response.data.username};// SE PUEDE OBTENER COMO claims.username y claims.sub por como lo seteamos en el backend
+            const user = { username: response.data.username };// SE PUEDE OBTENER COMO claims.username y claims.sub por como lo seteamos en el backend
 
-            dispatch({
-                type: 'login',
-                payload: {user, isAdmin: claims.isAdmin},//se pasa en el dispatch ya es un objeto
+            dispatch(onLogin({ user, isAdmin: claims.isAdmin }));
 
-            });
+            //     {
+
+
+            //     type: 'login', Esto se reemplazo por el slice authSlice
+            //     payload: {user, isAdmin: claims.isAdmin},//se pasa en el dispatch ya es un objeto
+
+            // });
             sessionStorage.setItem('login', JSON.stringify({
 
                 isAuth: true,
@@ -50,13 +55,13 @@ export const useAuth = () => {
             // redirigir a la pagina de usuarios
             navigate('/users');
 
-        } catch(error) {
+        } catch (error) {
 
-            if(error.response?.status == 401) {
-                
+            if (error.response?.status == 401) {
+
                 Swal.fire('Error de validacion', 'username y password invalidos', 'error');
-                
-            } else if(error.response?.status == 403){
+
+            } else if (error.response?.status == 403) {
                 Swal.fire('Error Login', 'No tiene acceso al recurso o permisos', 'error');
 
             } else {
@@ -71,21 +76,29 @@ export const useAuth = () => {
 
     const handlerLogout = () => {
 
-        dispatch({
-            type: 'logout',
-        });
+        dispatch(onLogout())
+
+        //     {
+        //     type: 'logout', Esto se quito para reducer se cambio por el authSlice de redux
+        // });
         sessionStorage.removeItem('login');
         sessionStorage.removeItem('token');//Se remueve el token
 
         sessionStorage.clear();//Se remueve todo
-        
+
 
     }
 
 
     return {
-        login, 
-        handlerLogin, 
+        // login, Ya no se devuelve el login 
+        login: {
+            user,
+            isAdmin, 
+            isAuth
+
+        },
+        handlerLogin,
         handlerLogout,
 
     }

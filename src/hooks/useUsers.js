@@ -1,35 +1,42 @@
 import Swal from "sweetalert2";
-import { usersReducer } from "../reducers/usersReducer";
-import { useContext, useReducer, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { deleteUser, findAllUsers, saveUser, updateUser } from "../auth/services/userService";
-import { AuthContext } from "../auth/context/AuthContext";
+import { deleteUser, findAllUsers, saveUser, update } from "../auth/services/userService";
+import { useDispatch, useSelector } from "react-redux";
+import { initialUserForm, loadingUsers, addUser, removeUser, updateUser, onUserSelectedForm, onOpenForm, onCloseForm, loadingError } from "../store/slices/users/usersSlice";
+import { useAuth } from "../auth/hooks/useAuth";
 
-const initialUsers = [];
+//const initialUsers = []; ya no se usa. por que se comento el reducer
 
-const initialUserForm = {
-    id: 0,
-    username: '',
-    password: '',
-    email: '',
-    admin: false,
-};
+// const initialUserForm = {
+//     id: 0,
+//     username: '',
+//     password: '',  ESTO SE LLEVO AL SLICE
+//     email: '',
+//     admin: false,  
+// };
 
-const initialErrors = {
-    username: '',
-    password: '',
-    email: ''
-};
+// const initialErrors = { ESTO SE LLEVO AL SLICE
+//     username: '',
+//     password: '',
+//     email: ''
+// };
 
 export const useUsers = () => {
 
-    const [users, dispatch] = useReducer(usersReducer, initialUsers);//El reducer propio y los valores iniciales
-    const [userSelected, setUserSelected] = useState(initialUserForm);
-    const [visibleForm, setVisibleForm] = useState(false);
-    const [errors, setErrors] = useState({ initialErrors });//Guardamos los errores de validacion del formulario
+    // const [users, dispatch] = useReducer(usersReducer, initialUsers);//El reducer propio y los valores iniciales
+
+    const { users, userSelected, visibleForm, errors } = useSelector(state => state.users);//Esto tambien es para redux para obtener usuarios
+    const dispatch = useDispatch(); //Ahora se usa redux ya no el reducer
+
+    // const [userSelected, setUserSe, lected] = useState(initialUserForm);//userSelected SE LLEVO AL SLICE
+    // const [visibleForm, setVisibleForm] = useState(false);//visibleForm SE LLEVO AL SLICE
+
+
+    // const [errors, setErrors] = useState({ initialErrors });//Guardamos los errores de validacion del formulario, ESTO SE LLEVO AL SLICE DE REDUX
     const navigate = useNavigate();
 
-    const { login, handlerLogout } = useContext(AuthContext);//Se va a requerirel contexto de login
+    // const { login, handlerLogout } = useContext(AuthContext);//Se va a requerirel contexto de loginse cambia por el hook
+    const { login, handlerLogout } = useAuth();
 
     const getUsers = async () => {
 
@@ -37,12 +44,12 @@ export const useUsers = () => {
 
             const result = await findAllUsers();
 
-            console.log(result);
 
-            dispatch({
-                type: 'loadingUsers',
-                payload: result.data,
-            });
+            dispatch(loadingUsers(result.data)) //Aqui se usa redux
+            // {
+            //     type: 'loadingUsers', esta es la forma reducer
+            //     payload: result.data,
+            // });
 
         } catch (error) {
 
@@ -68,15 +75,18 @@ export const useUsers = () => {
             if (user.id === 0) {
 
                 response = await saveUser(user);
+                dispatch(addUser(response.data))//ESTO YA ES CON REDUX es la parte sincrona
+
             } else {
-                response = await updateUser(user);
+                response = await update(user);
+                dispatch(updateUser(response.data));//ESTO YA ES CON REDUX es la parte sincrona
             }
 
-            dispatch({
-                type: (user.id === 0) ? 'addUser' : 'updateUser',
-                payload: response.data,
+            // dispatch({
+            //     type: (user.id === 0) ? 'addUser' : 'updateUser', ESTO ES CON REDUCER
+            //     payload: response.data,
 
-            });
+            // });
 
             Swal.fire({
                 title: (user.id === 0) ?
@@ -93,18 +103,21 @@ export const useUsers = () => {
         } catch (error) {
 
             if (error.response && error.response.status == 400) {
-                setErrors(error.response.data);
+                // setErrors(error.response.data); Esto se paso a slice de redux
+                dispatch(loadingError(error.response.data));
             } else if (error.response && error.response.status == 500 &&
                 error.response.data?.message?.includes('constraint')) {
 
                 if (error.response.data?.message?.includes('UK_username')) {
 
-                    setErrors({ username: 'El username ya existe, por favor elija otro' });
+                    // setErrors({ username: 'El username ya existe, por favor elija otro' });
+                    dispatch(loadingError(error.response.data));
                 }
 
                 if (error.response.data?.message?.includes('UK_email')) {
 
-                    setErrors({ email: 'El email ya existe, por favor elija otro' });
+                    // setErrors({ email: 'El email ya existe, por favor elija otro' });
+                    dispatch(loadingError(error.response.data));
                 }
 
             } else if (error.response?.status == 401) {
@@ -139,11 +152,13 @@ export const useUsers = () => {
 
                     await deleteUser(id); // se cambio a await por que apesar de ser void si existe un error lo lanza y ahi si lo regresa
                     //Aqui se elimina si se confirma
-                    dispatch({
-                        type: 'removeUser',
-                        payload: id,
+                    dispatch(removeUser(id)) //ESTO ES CON REDUX
 
-                    });
+                    // dispatch({
+                    //     type: 'removeUser', ESTO ES CON REDUCER
+                    //     payload: id,
+
+                    // });
 
                     Swal.fire({
                         title: "Usuario Eliminado!",
@@ -170,21 +185,28 @@ export const useUsers = () => {
 
     const handlerUserSelectedForm = (user) => {
 
-        setVisibleForm(true);
-        setUserSelected({ ...user });//Con esto creamos una nueva instancia con operador spread
+        dispatch(onUserSelectedForm({ ...user }));//Esto esta en el slice en el store de redux
+
+        // setVisibleForm(true);TODO ESTO FUE LLEVADO AL SLICE
+        // setUserSelected({ ...user });//Con esto creamos una nueva instancia con operador spread
 
     }
 
     const handlerOpenForm = () => {
 
-        setVisibleForm(true);
+        // setVisibleForm(true); todo esto se fue al slice
+        dispatch(onOpenForm());//Esto ys esta en redux
+
     }
 
     const handlerCloseForm = () => {
 
-        setVisibleForm(false);
-        setUserSelected(initialUserForm);
-        setErrors({});
+        // setVisibleForm(false);Todo esto se paso al slice de redux
+        // setUserSelected(initialUserForm);
+
+        dispatch(onCloseForm());
+        // setErrors({});
+        dispatch(loadingError({}));
     }
     return {
         users,

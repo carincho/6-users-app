@@ -1,12 +1,13 @@
-import { useContext } from "react"
 import { NavLink } from "react-router-dom"
-import { UserContext } from "../context/UserContext";
-import { AuthContext } from "../auth/context/AuthContext";
+import { useUsers } from "../hooks/useUsers";
+import { useAuth } from "../auth/hooks/useAuth";
 
 export const UserRow = ({ id, username, email, admin }) => {
 
-    const { handlerRemoveUser, handlerUserSelectedForm } = useContext(UserContext);
-    const {login} = useContext(AuthContext);//Se va a requerirel contexto de login
+    // const { handlerRemoveUser, handlerUserSelectedForm } = useContext(UserContext); Se usa el hooks useUsers
+    const { handlerRemoveUser, handlerUserSelectedForm } = useUsers();
+    // const {login} = useContext(AuthContext);//Se va a requerirel contexto de login Se reemplaza por el hook useAuth
+    const {login} = useAuth();//Se va a requerirel contexto de login
 
     // onClick={() => onRemoveUser({id})}> Esto no se puede simplificar por que no pasamos nada
 

@@ -1,26 +1,28 @@
 import { UserModalForm } from "../components/UserModalForm";
 import { UsersList } from "../components/UsersList";
-import { useContext, useEffect } from "react";
-import { UserContext } from "../context/UserContext";
-import { AuthContext } from "../auth/context/AuthContext";
+import { useEffect } from "react";
+import { useUsers } from "../hooks/useUsers";
+import { useAuth } from "../auth/hooks/useAuth";
 
 
 
 
 
-export const UsersPage = ({ }) => {
+export const UsersPage = () => {
 
     const {
-    users,
-    visibleForm,
-    handlerOpenForm,
-    getUsers,
+        users,
+        visibleForm,
+        handlerOpenForm,
+        getUsers,
 
-} = useContext(UserContext);
+        // } = useContext(UserContext); YA no se usa UseContext para obtener la data
+    } = useUsers();//Ahora se usa el slice
 
-const {login} = useContext(AuthContext);//Se va a requerirel contexto de login
+    // const {login} = useContext(AuthContext);//Se va a requerirel contexto de login⁄ Se reemplaza por el hook useAuth
+    const { login } = useAuth();//Se va a requerirel contexto de login
 
-//Se invoca cuando se crea el componente userList por unica vez, es decir cuando se monta el componente, se hace la consulta a la base de datos para obtener los usuarios y se actualiza el estado con la lista de usuarios obtenida
+    //Se invoca cuando se crea el componente userList por unica vez, es decir cuando se monta el componente, se hace la consulta a la base de datos para obtener los usuarios y se actualiza el estado con la lista de usuarios obtenida
     useEffect(() => {
         getUsers();
     }, []);
@@ -59,7 +61,7 @@ const {login} = useContext(AuthContext);//Se va a requerirel contexto de login
 
                         {users.length === 0
                             ? <div className="alert alert-warning">No hay usuarios en el sistema !</div>
-                            : <UsersList users={users}/>
+                            : <UsersList users={users} />
                         }
 
                     </div>

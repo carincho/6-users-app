@@ -1,15 +1,16 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import Swal from "sweetalert2";
-import { AuthContext } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 
 const initialLoginform = {
     username: '',
     password: '',
 }
 
-export const LoginPages = ({}) => {
+export const LoginPages = ({ }) => {
 
-    const {handlerLogin} = useContext(AuthContext);
+    // const {handlerLogin} = useContext(AuthContext);Se reemplaza por el hook
+    const { handlerLogin } = useAuth();
 
 
 
@@ -34,9 +35,9 @@ export const LoginPages = ({}) => {
             Swal.fire('Error de validacion', 'username y password requeridos', 'error');
         }
 
-        handlerLogin({username, password});
+        handlerLogin({ username, password });
         //aqui implementamos el login
-       
+
         setLoginForm(initialLoginform);//reiniciamos formulario
 
     }

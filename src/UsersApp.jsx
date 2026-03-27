@@ -1,34 +1,18 @@
+import { Provider } from "react-redux"
+import { AppRoutes } from "./AppRoutes"
+import { store } from "./store/store"
 
-import { LoginPages } from "./auth/pages/LoginPages";
-import { Navigate, Route, Routes } from "react-router-dom";
-import { UserRoutes } from "./routes/UserRoutes";
-import { useContext } from "react";
-import { AuthContext } from "./auth/context/AuthContext";
 
-//Con la ruta /* se indica que cualquier ruta que no sea login se redirija a login, esto es para evitar que el usuario pueda acceder a rutas privadas sin estar autenticado */
-
+//provider de redux todo la aplicacion puede acceder al store
+//La variable store esta configurado ya en store.js
 export const UsersApp = () => {
 
-    const { login } = useContext(AuthContext);
-    
     return (
+        <Provider store={store}>
 
-        <Routes>
+            <AppRoutes />
 
-            {
-            login.isAuth
-                ? (
-                   <Route path="/*" element={ <UserRoutes  />}/>
-                )
-                :
-                <> 
-                    <Route path="/login" element={ <LoginPages/>}/>
-                    <Route path="/*" element={ <Navigate to="/login" />}/>
-                </>
-            }
+        </Provider>
+    )
 
-
-        </Routes>
-    );
-    
 }

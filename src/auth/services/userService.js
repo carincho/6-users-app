@@ -47,7 +47,7 @@ export const saveUser = async ({ username, email, password, admin }) => {
 
 }
 
-export const updateUser = async ({ id, username, email, admin }) => {
+export const update = async ({ id, username, email, admin }) => {
     try {
         // return await axios.put(`${BASE_URL}/${id}`, { Se reemplaza por el usersAPi ya no se usa axios
         return await usersApi.put(`${BASE_URL}/${id}`, {
