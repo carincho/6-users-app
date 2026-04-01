@@ -2,7 +2,7 @@ import Swal from "sweetalert2";
 import { loginUser } from "../services/authService";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { onLogin, onLogout } from "../../store/slices/auth/authSlice";
+import { onLogin, onLogout, onInitLogin } from "../../store/slices/auth/authSlice";
 
 // const initialLogin = JSON.parse(sessionStorage.getItem('login')) || el estado inicial se paso al slice authSlice
 // {
@@ -23,6 +23,8 @@ export const useAuth = () => {
 
 
         try {
+
+            dispatch(onInitLogin());// se llama al initLogin para poner el isLoginLoading en true
 
             const response = await loginUser({ username, password });
 
@@ -56,6 +58,7 @@ export const useAuth = () => {
             navigate('/users');
 
         } catch (error) {
+             dispatch(onLogout())
 
             if (error.response?.status == 401) {
 
@@ -76,7 +79,7 @@ export const useAuth = () => {
 
     const handlerLogout = () => {
 
-        dispatch(onLogout())
+        dispatch(onLogout());
 
         //     {
         //     type: 'logout', Esto se quito para reducer se cambio por el authSlice de redux
