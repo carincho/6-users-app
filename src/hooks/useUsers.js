@@ -25,7 +25,7 @@ export const useUsers = () => {
 
     // const [users, dispatch] = useReducer(usersReducer, initialUsers);//El reducer propio y los valores iniciales
 
-    const { users, userSelected, visibleForm, errors } = useSelector(state => state.users);//Esto tambien es para redux para obtener usuarios
+    const { users, userSelected, visibleForm, errors, isLoading} = useSelector(state => state.users);//Esto tambien es para redux para obtener usuarios
     const dispatch = useDispatch(); //Ahora se usa redux ya no el reducer
 
     // const [userSelected, setUserSe, lected] = useState(initialUserForm);//userSelected SE LLEVO AL SLICE
@@ -214,6 +214,7 @@ export const useUsers = () => {
         initialUserForm,
         visibleForm,
         errors,
+        isLoading,
         handlerAddUser,
         handlerRemoveUser,
         handlerUserSelectedForm,

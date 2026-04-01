@@ -23,7 +23,8 @@ export const usersSlice = createSlice({
         users: [],
         userSelected: initialUserForm,//Son valores por defecto
         visibleForm: false,
-        errors: initialErrors, 
+        errors: initialErrors,
+        isLoading: true,
 
     },
     reducers: {
@@ -62,6 +63,7 @@ export const usersSlice = createSlice({
         loadingUsers: (state, {payload}) => {
 
             state.users = payload; //Aqui el payload es la lista de usuarios que se obtiene de la consulta a la base de datos
+            state.isLoading = false;
         },
 
         onUserSelectedForm: (state, {payload}) => {
