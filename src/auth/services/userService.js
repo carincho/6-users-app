@@ -26,6 +26,18 @@ export const findAllUsers = async () => {
     }
 
 }
+export const findAllPages = async (page = 0) => {
+
+    try {
+        // const response = await axios.get(BASE_URL); Se reemplaza por el usersAPi ya no se usa axios
+        const response = await usersApi.get(`${BASE_URL}/page/${page}`);
+        return response
+
+    } catch (error) {
+       throw error;
+    }
+
+}
 
 export const saveUser = async ({ username, email, password, admin }) => {
     try {

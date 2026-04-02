@@ -9,6 +9,8 @@ export const UserRoutes = ({ }) => {
 
     // const { login } = useContext(AuthContext);//Se va a requerirel contexto de login Se reemplaza por el hook useAuth
     // const { login } = useAuth();//Se va a requerirel contexto de login
+{/* <Route path="users/page/:page" Aqui se pasa el numero de pagina que recibe el metido findAllPages*/}
+
     const {isAdmin} = useSelector(state => state.auth); //Lo obtenemos con el selector por que solo usamos is admin
 
     //    Los hijos son todos los que esta anidado dentro del provider, es decir todos los componentes que van a consumir el contexto sin necesidad del hook
@@ -19,6 +21,7 @@ export const UserRoutes = ({ }) => {
             <NavBar />
             <Routes>
                 <Route path="users" element={<UsersPage />} />
+                <Route path="users/page/:page" element={<UsersPage />} />
                 <Route path="/" element={<Navigate to={"/users"} />} />
 
                 {!isAdmin ||

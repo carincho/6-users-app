@@ -21,6 +21,7 @@ export const usersSlice = createSlice({
     name: 'users',//Nombre del slice
     initialState: {
         users: [],
+        paginator:{},// se agrega el paginator para guardar la informacion del paginador
         userSelected: initialUserForm,//Son valores por defecto
         visibleForm: false,
         errors: initialErrors,
@@ -62,7 +63,9 @@ export const usersSlice = createSlice({
 
         loadingUsers: (state, {payload}) => {
 
-            state.users = payload; //Aqui el payload es la lista de usuarios que se obtiene de la consulta a la base de datos
+            // state.users = payload.content; Esto se cambio por el paginador
+            state.users = payload.content; //Aqui el payload es la lista de usuarios que se obtiene de la consulta a la base de datos ahora se obtiene del paginador
+            state.paginator = payload;
             state.isLoading = false;
         },
 

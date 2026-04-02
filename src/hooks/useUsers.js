@@ -1,6 +1,6 @@
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
-import { deleteUser, findAllUsers, saveUser, update } from "../auth/services/userService";
+import { deleteUser, findAllPages, saveUser, update } from "../auth/services/userService";
 import { useDispatch, useSelector } from "react-redux";
 import { initialUserForm, loadingUsers, addUser, removeUser, updateUser, onUserSelectedForm, onOpenForm, onCloseForm, loadingError } from "../store/slices/users/usersSlice";
 import { useAuth } from "../auth/hooks/useAuth";
@@ -25,7 +25,7 @@ export const useUsers = () => {
 
     // const [users, dispatch] = useReducer(usersReducer, initialUsers);//El reducer propio y los valores iniciales
 
-    const { users, userSelected, visibleForm, errors, isLoading} = useSelector(state => state.users);//Esto tambien es para redux para obtener usuarios
+    const { users, userSelected, visibleForm, errors, isLoading, paginator} = useSelector(state => state.users);//Esto tambien es para redux para obtener usuarios
     const dispatch = useDispatch(); //Ahora se usa redux ya no el reducer
 
     // const [userSelected, setUserSe, lected] = useState(initialUserForm);//userSelected SE LLEVO AL SLICE
@@ -38,11 +38,12 @@ export const useUsers = () => {
     // const { login, handlerLogout } = useContext(AuthContext);//Se va a requerirel contexto de loginse cambia por el hook
     const { login, handlerLogout } = useAuth();
 
-    const getUsers = async () => {
+    const getUsers = async (page = 0) => {
 
         try {
 
-            const result = await findAllUsers();
+            // const result = await findAll();
+            const result = await findAllPages(page);// Se cambio por el paginador
 
 
             dispatch(loadingUsers(result.data)) //Aqui se usa redux
@@ -215,6 +216,7 @@ export const useUsers = () => {
         visibleForm,
         errors,
         isLoading,
+        paginator,
         handlerAddUser,
         handlerRemoveUser,
         handlerUserSelectedForm,

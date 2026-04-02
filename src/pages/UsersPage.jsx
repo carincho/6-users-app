@@ -3,6 +3,8 @@ import { UsersList } from "../components/UsersList";
 import { useEffect } from "react";
 import { useUsers } from "../hooks/useUsers";
 import { useAuth } from "../auth/hooks/useAuth";
+import { useParams } from "react-router-dom";
+import { Paginator } from "../components/Paginator";
 
 
 
@@ -10,10 +12,12 @@ import { useAuth } from "../auth/hooks/useAuth";
 
 export const UsersPage = () => {
 
+    const {page} = useParams();//Obtenemos el numero de pagina que se pasa por la url para hacer la consulta a la base de datos con el paginador y se usa el mismo nombre que se uso en UserRoutes
     const {
         users,
         visibleForm,
         isLoading,
+        paginator,
         handlerOpenForm,
         getUsers,
 
@@ -25,8 +29,10 @@ export const UsersPage = () => {
 
     //Se invoca cuando se crea el componente userList por unica vez, es decir cuando se monta el componente, se hace la consulta a la base de datos para obtener los usuarios y se actualiza el estado con la lista de usuarios obtenida
     useEffect(() => {
-        getUsers();
-    }, []);
+
+        getUsers(page);
+
+    }, [, page]);//Se agrega el page como dependencia para que se vuelva a ejecutar la consulta cada vez que cambie el numero de pagina en la url
 
 
     if (isLoading) {
@@ -74,7 +80,12 @@ export const UsersPage = () => {
 
                         {users.length === 0
                             ? <div className="alert alert-warning">No hay usuarios en el sistema !</div>
-                            : <UsersList users={users} />
+                            : 
+                            <>
+                                <UsersList users={users} />
+                                <Paginator url={'/users/page'} paginator={paginator}/>
+                                
+                            </>
                         }
 
                     </div>
